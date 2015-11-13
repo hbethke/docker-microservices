@@ -1,3 +1,10 @@
+mysql:
+  image: mysql
+  restart: always
+  ports:
+    - "3306:3306"
+    - "22:22"
+
 rabbitmq:
   image: rabbitmq:3-management
   restart: always
@@ -23,6 +30,12 @@ pro:
   links:
     - discovery
 
+batch:
+  image: tot/batch-service
+  restart: always
+  links:
+    - discovery
+
 rec:
   image: callista/recommendation-service
   restart: always
@@ -44,6 +57,14 @@ composite:
 
 api:
   image: callista/product-api-service
+  restart: always
+  links:
+    - auth
+    - discovery
+    - rabbitmq
+
+batch-api:
+  image: tot/batch-api-service
   restart: always
   links:
     - auth

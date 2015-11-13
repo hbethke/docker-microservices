@@ -37,6 +37,7 @@ zuul:
   prefix: /api
   routes:
     productapi: /product/**
+    batchapi: /batch/**
 
 logging:
   level:
