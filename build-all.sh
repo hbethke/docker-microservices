@@ -2,11 +2,13 @@
 
 cd util;                                              ./gradlew clean publishToMavenLocal; cd -
 
+cd microservices/core/batch-service;                ./gradlew clean publishToMavenLocal build distDocker; cd -
 cd microservices/core/product-service;                ./gradlew clean publishToMavenLocal build distDocker; cd -
 cd microservices/core/recommendation-service;         ./gradlew clean publishToMavenLocal build distDocker; cd -
 cd microservices/core/review-service;                 ./gradlew clean publishToMavenLocal build distDocker; cd -
 cd microservices/composite/product-composite-service; ./gradlew clean build distDocker; cd -
 cd microservices/api/product-api-service;             ./gradlew clean build distDocker; cd -
+cd microservices/api/batch-api-service;             ./gradlew clean build distDocker; cd -
 
 cd microservices/support/auth-server;                 ./gradlew clean build distDocker; cd -
 cd microservices/support/discovery-server;            ./gradlew clean build distDocker; cd -
