@@ -1,0 +1,1 @@
+create table springbatchjob.STUDENT_DATA(firstName varchar(255), lastName varchar(255), school varchar(255), rollNumber int, PRIMARY KEY(rollNumber));
