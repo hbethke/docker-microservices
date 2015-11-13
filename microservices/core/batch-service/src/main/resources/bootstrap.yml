@@ -1,6 +1,14 @@
 spring:
   application:
     name: batch
+
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/springbatchjob
+    username: adesso
+    password: adesso
+
   cloud:
     config:
       uri: ${vcap.services.${PREFIX:}configserver.credentials.uri:http://user:password@localhost:8888}
+

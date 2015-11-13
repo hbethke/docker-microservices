@@ -3,7 +3,11 @@ mysql:
   restart: always
   ports:
     - "3306:3306"
-    - "22:22"
+    - "52022:22"
+  environment:
+    - MYSQL_ROOT_PASSWORD=adesso
+    - MYSQL_PASSWORD=adesso
+    - MYSQL_USER=adesso
 
 rabbitmq:
   image: rabbitmq:3-management
@@ -35,6 +39,7 @@ batch:
   restart: always
   links:
     - discovery
+    - mysql
 
 rec:
   image: callista/recommendation-service

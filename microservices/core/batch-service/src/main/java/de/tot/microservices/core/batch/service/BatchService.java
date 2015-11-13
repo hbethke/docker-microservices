@@ -32,32 +32,6 @@ public class BatchService {
 
     String[] springConfig  = {"META-INF/spring/job-config.xml"};
 
-    public BatchService() {
-        try {
-            ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
-            JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
-            Job job = (Job) context.getBean("batchJob");
-
-            FlatFileItemReader reader = (FlatFileItemReader) context.getBean("itemReader");
-            reader.setResource(getTestInput());
-
-            try {
-                JobExecution execution = jobLauncher.run(job,  new JobParameters());
-
-                System.out.println("Exit status: " + execution.getStatus());
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Resource getTestInput() {
-        return new UrlResource(this.getClass().getResource("/META-INF/sampleData/studentData.csv"));
-    }
-
     /**
      * Sample usage: curl $HOST:$PORT/product/1
      *
@@ -68,7 +42,28 @@ public class BatchService {
     public void runBatch(@PathVariable int batchId) {
         LOG.info("/batch called:" + batchId);
 
+        try {
+            ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
+            JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
+            Job job = (Job) context.getBean("batchJob");
+
+            FlatFileItemReader reader = (FlatFileItemReader) context.getBean("itemReader");
+            reader.setResource(getTestInput());
+
+            JobExecution execution = jobLauncher.run(job,  new JobParameters());
+
+            LOG.info("Job exit status: " + execution.getStatus());
+
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 //        return new Product(productId, "name", 123);
 	    return;
+    }
+
+    private Resource getTestInput() {
+        return new UrlResource(this.getClass().getResource("/META-INF/sampleData/studentData.csv"));
     }
 }
