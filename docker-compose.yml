@@ -35,12 +35,14 @@ auth:
   ports:
     - "9999:9999"
   
-#turbine:
-#  image: callista/turbine
-##  volumes:
-##    - $PWD/logs:/logs
-#  links:
-#    - rabbitmq
+turbine:
+  image: callista/turbine
+  restart: always
+  ports:
+    - "8989:8989"
+  links:
+    - rabbitmq
+    - monitor
   
 pro:
   image: callista/product-service
