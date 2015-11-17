@@ -1,0 +1,93 @@
+buildscript {
+    ext {
+        springBootVersion = '1.2.2.RELEASE'
+        springBatchVersion = '3.0.3.RELEASE'
+        springOxmVersion = '4.0.5.RELEASE'
+        springJdbcVersion = '4.0.5.RELEASE'
+        commonsVersion = '1.4'
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'maven-publish'
+apply plugin: 'docker'
+
+jar {
+    baseName = 'batch-service'
+    version = '0.0.1-SNAPSHOT'
+}
+
+// $ gradle publishToMavenLocal
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            // TODO: Where to place these properties?
+            groupId 'de.tot.microservices.core.batch'
+            artifactId 'batch-service'
+            version '0.0.1-SNAPSHOT'
+
+            from components.java
+        }
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+group = 'tot'
+mainClassName = 'de.tot.microservices.core.batch.BatchServiceApplication'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+
+dependencies {
+    // TODO: Added ver no on the three core starter deps to make the maven plugin to work
+    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}") {
+        exclude module: 'spring-boot-starter-tomcat'
+    }
+    compile("org.springframework.boot:spring-boot-starter-undertow:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}")
+    compile("org.springframework.cloud:spring-cloud-starter-hystrix:1.0.0.RELEASE")
+    compile("org.springframework.cloud:spring-cloud-starter-eureka:1.0.0.RELEASE")
+
+    compile("se.callista.microservises:util:0.0.1-SNAPSHOT")
+
+    compile("org.springframework.batch:spring-batch-core:${springBatchVersion}")
+    compile("org.springframework.batch:spring-batch-test:${springBatchVersion}")
+    compile("org.springframework:spring-oxm:${springOxmVersion}")
+    compile("org.springframework:spring-jdbc:${springJdbcVersion}")
+    compile("commons-dbcp:commons-dbcp:${commonsVersion}")
+    compile("junit:junit:4.7")
+    compile("mysql:mysql-connector-java:5.1.34")
+
+
+    testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    testCompile("org.hsqldb:hsqldb:2.3.3")
+}
+
+distDocker {
+    exposePort 8080
+    setEnvironment 'JAVA_OPTS', '-Dspring.profiles.active=docker'
+}
+
+docker {
+    maintainer = 'Holger Bethke <holger.bethke@adesso.de>'
+    baseImage = 'java:8'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}

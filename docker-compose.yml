@@ -15,7 +15,17 @@
 #  links:
 #    - discovery
 #  command: java -jar -Dspring.profiles.active=docker2 microservices/support/discovery-server/build/libs/discovery-server-0.0.1-SNAPSHOT.jar
-  
+mysql:
+  image: bethke/mysql
+  restart: always
+  ports:
+    - "52022:22"
+    - "3306:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=adesso
+    - MYSQL_PASSWORD=adesso
+    - MYSQL_USER=adesso
+
 rabbitmq:
   image: rabbitmq:3-management
   restart: always
@@ -44,13 +54,22 @@ turbine:
     - rabbitmq
     - monitor
   
-pro:
+product:
   image: callista/product-service
   restart: always
   volumes:
     - $PWD/logs:/logs
   links:
     - discovery
+
+batch:
+  image: tot/batch-service
+  restart: always
+  volumes:
+    - $PWD/logs:/logs
+  links:
+    - discovery
+    - mysql
 
 rec:
   image: callista/recommendation-service
@@ -77,7 +96,7 @@ composite:
     - discovery
     - rabbitmq
 
-api:
+product-api:
   image: callista/product-api-service
   restart: always
   volumes:
@@ -87,13 +106,26 @@ api:
     - discovery
     - rabbitmq
 
+batch-api:
+  image: tot/batch-api-service
+  restart: always
+  volumes:
+    - $PWD/logs:/logs
+  links:
+    - auth
+    - discovery
+    - rabbitmq
+    - mysql
+
+
 monitor:
   image: callista/monitor-dashboard
   restart: always
   ports:
     - "7979:7979"
   links:
-    - api
+    - product-api
+    - batch-api
     - composite
 
 edge:
@@ -103,4 +135,5 @@ edge:
     - "443:8765"
   links:
     - discovery
-    - api
+    - product-api
+    - batch-api
