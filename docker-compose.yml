@@ -16,6 +16,15 @@ rabbitmq:
     - "5672:5672"
     - "15672:15672"
 
+turbine:
+  image: callista/turbine
+  restart: always
+  ports:
+    - "8989:8989"
+  links:
+    - rabbitmq
+    - monitor
+
 discovery:
   image: callista/discovery-server
   restart: always
