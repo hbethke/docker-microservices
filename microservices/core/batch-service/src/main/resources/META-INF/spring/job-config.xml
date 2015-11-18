@@ -39,7 +39,7 @@
 	
 	<!-- Read data from the csv file-->
 	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-<property name="resource" value="classpath:META-INF/sampleData/studentData.csv"></property>
+<!--        <property name="resource" value="classpath:META-INF/sampleData/studentData.csv"></property> -->
    		<property name="linesToSkip" value="1"></property>
    		<property name="lineMapper">
    			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">

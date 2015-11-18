@@ -41,39 +41,39 @@ public class BatchApiService {
     @Autowired
     private LoadBalancerClient loadBalancer;
 
-    @RequestMapping("/{productId}")
-    @HystrixCommand(fallbackMethod = "defaultProductComposite")
-    public ResponseEntity<String> getProductComposite(
-            @PathVariable int productId,
+    @RequestMapping("/{jobName}")
+    @HystrixCommand(fallbackMethod = "defaultBatchJob")
+    public ResponseEntity<String> executeJob(
+            @PathVariable String jobName,
             @RequestHeader(value="Authorization") String authorizationHeader,
             Principal currentUser) {
 
-        MDC.put("productId", productId);
-        LOG.info("ProductApi: User={}, Auth={}, called with productId={}", currentUser.getName(), authorizationHeader, productId);
+        MDC.put("jobName", jobName);
+        LOG.info("BatchAPI: User={}, Auth={}, called with jobName={}", currentUser.getName(), authorizationHeader, jobName);
 
-        URI uri = loadBalancer.choose("productcomposite").getUri();
-        String url = uri.toString() + "/product/" + productId;
-        LOG.debug("GetProductComposite from URL: {}", url);
+        URI uri = loadBalancer.choose("batch").getUri();
+        String url = uri.toString() + "/batch/" + jobName;
+        LOG.debug("GetBatchJob from URL: {}", url);
 
         ResponseEntity<String> result = restTemplate.getForEntity(url, String.class);
-        LOG.info("GetProductComposite http-status: {}", result.getStatusCode());
-        LOG.debug("GetProductComposite body: {}", result.getBody());
+        LOG.info("GetBatchJob http-status: {}", result.getStatusCode());
+        LOG.debug("GetBatchJob body: {}", result.getBody());
 
         return util.createResponse(result);
     }
 
     /**
-     * Fallback method for getProductComposite()
+     * Fallback method for getBatchJob()
      *
-     * @param productId
+     * @param jobName
      * @return
      */
-    public ResponseEntity<String> defaultProductComposite(
-            @PathVariable int productId,
+    public ResponseEntity<String> defaultBatchJob(
+            @PathVariable String jobName,
             @RequestHeader(value="Authorization") String authorizationHeader,
             Principal currentUser) {
 
-        LOG.warn("Using fallback method for product-composite-service. User={}, Auth={}, called with productId={}", currentUser.getName(), authorizationHeader, productId);
+        LOG.warn("Using fallback method for batch-service. User={}, Auth={}, called with jobName={}", currentUser.getName(), authorizationHeader, jobName);
         return new ResponseEntity<String>("", HttpStatus.BAD_GATEWAY);
     }
 }

@@ -66,6 +66,7 @@ logging:
   level:
     root: WARN
     se.callista: INFO
+    de.tot: INFO
     # Set DEBUG level on Hystrix to get an error message when a fallback method is used.
     com.netflix.hystrix: DEBUG
 

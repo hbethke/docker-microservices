@@ -117,7 +117,6 @@ batch-api:
     - rabbitmq
     - mysql
 
-
 monitor:
   image: callista/monitor-dashboard
   restart: always

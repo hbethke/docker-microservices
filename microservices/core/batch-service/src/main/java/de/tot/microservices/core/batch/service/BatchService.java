@@ -8,12 +8,12 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -32,25 +32,17 @@ public class BatchService {
 
     String[] springConfig  = {"META-INF/spring/job-config.xml"};
 
+    private static ApplicationContext context = null;
+    private static JobLauncher jobLauncher = null;
+
     public BatchService() {
         try {
-            ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
-            JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
-            Job job = (Job) context.getBean("batchJob");
-
-            FlatFileItemReader reader = (FlatFileItemReader) context.getBean("itemReader");
-            reader.setResource(getTestInput());
-
-            try {
-                JobExecution execution = jobLauncher.run(job,  new JobParameters());
-
-                System.out.println("Exit status: " + execution.getStatus());
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LOG.info("Starting Batch Service");
+            this.context = new ClassPathXmlApplicationContext(springConfig);
+            this.jobLauncher = (JobLauncher) context.getBean("jobLauncher");
+            LOG.info("Done");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Error on creating BatchService:" + e.getMessage(), e);
         }
     }
 
@@ -61,14 +53,27 @@ public class BatchService {
     /**
      * Sample usage: curl $HOST:$PORT/product/1
      *
-     * @param batchId
+     * @param jobName
      * @return
      */
-    @RequestMapping("/batch/{batchId}")
-    public void getBatch(@PathVariable int batchId) {
-        LOG.info("/batch called:" + batchId);
+    @RequestMapping("/batch/{jobName}")
+    public String getBatch(@PathVariable String jobName) {
+        LOG.info("/batch called:" + jobName);
 
-//        return new Product(productId, "name", 123);
-	return;
+        try {
+            Job job = (Job) context.getBean("batchJob");
+
+            FlatFileItemReader reader = (FlatFileItemReader) context.getBean("itemReader");
+            reader.setResource(getTestInput());
+
+            JobExecution execution = jobLauncher.run(job,  new JobParameters());
+
+            LOG.info("Exit status: " + execution.getStatus());
+
+            return "Job exit status: " + execution.getExitStatus();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return "Job error: " + e.getMessage();
+        }
     }
 }

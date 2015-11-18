@@ -19,11 +19,18 @@ logging:
   level:
     root: WARN
     se.callista: INFO
+    de.tot: INFO
 
 ---
 # For deployment in Docker containers
 spring:
   profiles: docker
+
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/springbatchjob
+    username: adesso
+    password: adesso
 
 server:
   port: 8080
